@@ -141,5 +141,13 @@ public class CollectionStream {
                 .mapToObj(x -> x).collect(Collectors.toList());
         System.out.println(result);
     }
+    
+    @Test
+    public void testInterupt() {
+        Stream.of(1,2,3,4).forEach(i -> {
+            System.out.println(i / 0);
+        });
+        System.out.println(123);
+    }
 
 }

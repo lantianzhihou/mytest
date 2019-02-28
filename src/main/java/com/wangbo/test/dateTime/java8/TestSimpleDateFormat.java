@@ -60,7 +60,8 @@ public class TestSimpleDateFormat {
     @Test
     public void testLocalDateTime() throws ExecutionException, InterruptedException {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        Callable<LocalDateTime> task = () -> LocalDateTime.parse("2017-08-06 12:32:51", timeFormatter);
+        Callable<LocalDateTime> task = () -> LocalDateTime.parse("2017-08-06 12:32:51",
+                timeFormatter);
 
         List<Future<LocalDateTime>> results = new ArrayList<>();
         ExecutorService pool = Executors.newFixedThreadPool(10);
@@ -72,7 +73,8 @@ public class TestSimpleDateFormat {
         }
     }
 
-    private static final ThreadLocal<DateFormat> df = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyyMMdd"));
+    private static final ThreadLocal<DateFormat> df = ThreadLocal
+            .withInitial(() -> new SimpleDateFormat("yyyyMMdd"));
 
     private Date convert(String source) throws ParseException {
         return df.get().parse(source);
