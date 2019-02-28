@@ -6,7 +6,7 @@
  * 分为饿汉式和懒汉式
  *  1.因为饿汉式单例是在类加载时就创建了单例对象，浪费内存，但不会有多线程安全问题
  *  2.懒汉式单例因为要考虑到多线程安全的问题，常用的有效方式有三种：
- *      双检锁式（double-checked lock）加上关键字volatile
+ *      双检锁式（double-checked lock）加上关键字volatile；第二个if判断语句通过synchronized进行同步
  *      登记式/静态内部类（singleton-holder）
  *      枚举式
  * 
