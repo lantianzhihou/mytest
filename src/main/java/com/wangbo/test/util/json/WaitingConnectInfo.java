@@ -1,4 +1,4 @@
-package com.wangbo.test.json;
+package com.wangbo.test.util.json;
 
 public class WaitingConnectInfo {
 

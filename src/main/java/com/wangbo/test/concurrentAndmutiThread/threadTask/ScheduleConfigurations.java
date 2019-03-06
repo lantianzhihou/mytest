@@ -12,11 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
-import org.springframework.stereotype.Component;
 
 //@Component
 @Configuration
@@ -81,7 +79,11 @@ public class ScheduleConfigurations implements SchedulingConfigurer {
 					
 			@Override
 			public Thread newThread(Runnable target) {
-				return new Thread(group, target, namePrefix + "-" + count.incrementAndGet());
+			    Thread thread = new Thread(group, target, namePrefix + "-" + count.incrementAndGet());
+//			    thread.setPriority(1);
+//			    int maxPriority = group.getMaxPriority();
+//			    System.out.println(maxPriority);
+				return thread;
 			}
 		});
 		
