@@ -148,7 +148,7 @@
 			<artifactId>commons-net</artifactId>
 			<version>3.5</version>
 		</dependency>
-		
+
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -186,7 +186,16 @@
 			<version>7.2.1</version>
 		</dependency>
 		<!-- end -->
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hynnet</groupId>
+			<artifactId>jacob</artifactId>
+			<version>1.14.3</version>
+		</dependency>
+		<!-- 添加Sqlite依赖（可选：如果不需要使用印章功能的话，不需要添加此依赖） -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -242,33 +251,19 @@
 				<artifactId>maven-install-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>1</id>
+						<id>2</id>
 						<phase>initialize</phase>
 						<goals>
 							<goal>install-file</goal>
 						</goals>
 						<configuration>
-							<groupId>org.jdesktop</groupId>
-							<artifactId>swing-layout</artifactId>
-							<version>1.0.3</version>
+							<groupId>com.zhuozhengsoft</groupId>
+							<artifactId>pageoffice</artifactId>
+							<version>4.4.0.4</version>
 							<packaging>jar</packaging>
-							<file>${basedir}/src/main/lib/swing-layout-1.0.3.jar</file>
+							<file>${basedir}/src/main/lib/pageoffice4.4.0.4.jar</file>
 						</configuration>
 					</execution>
-					<!-- <execution> -->
-					<!-- <id>2</id> -->
-					<!-- <phase>initialize</phase> -->
-					<!-- <goals> -->
-					<!-- <goal>install-file</goal> -->
-					<!-- </goals> -->
-					<!-- <configuration> -->
-					<!-- <groupId>org.netbeans</groupId> -->
-					<!-- <artifactId>awtextra</artifactId> -->
-					<!-- <version>1.0</version> -->
-					<!-- <packaging>jar</packaging> -->
-					<!-- <file>${basedir}/src/main/lib/awtextra-1.0.jar</file> -->
-					<!-- </configuration> -->
-					<!-- </execution> -->
 				</executions>
 			</plugin>
 		</plugins>
@@ -318,6 +313,8 @@
 					<include>**/*.properties</include>
 					<include>**/*.xml</include>
 					<include>**/*.pfx</include>
+					<include>**/*.html</include>
+					<include>**/*.doc</include>
 				</includes>
 				<!-- 是否替换资源中的属性 -->
 				<filtering>false</filtering>

@@ -8,7 +8,7 @@ import java.io.IOException;
  * 2、声明包的私有类和常量；<br>   
  * 
  */ 
-public class PkgInfoTest {
+public class PkgInfoTest{
 
 	public static void main(String[] args) {
 		Package pkg = PkgInfoTest.class.getPackage();

@@ -21,7 +21,10 @@ import org.junit.Test;
  * 
  * >>>为逻辑移位符，向右移n位，高位补0；
  * >> 算数移位符，也是向右移n位，不同的是：正数高位补0，负数高位补1；
- * << 移位符，向左移n位，低位补0
+ * 1. 负数的>>运算 <==> 算数/2的n次方 - 算数%2的n次方 != 0 ? 1 : 0; 而0和正数的>>运算 <==> 算数/2的n次方
+ * 2. 负数的>>运算最终值为-1; 而0和正数的>>运算最终值为0
+ * 
+ * << 移位符，向左移n位，低位补0 (等价于 算数乘以2的n次方)
  * 
  * 利用“移位”操作实现或者调用API函数 将十进制数转换成二进制数
  * <一句话功能简述>
@@ -33,15 +36,16 @@ import org.junit.Test;
  * @since  [产品/模块版本]
  */
 public class ThreadPoolExecutorTest {
-
+    
+    
     // runState is stored in the high-order bits
     private static final int COUNT_BITS = Integer.SIZE - 3;
     private static final int CAPACITY = (1 << COUNT_BITS) - 1;
     private static final int RUNNING = -1 << COUNT_BITS;
-//    private static final int SHUTDOWN   =  0 << COUNT_BITS;
-//    private static final int STOP       =  1 << COUNT_BITS;
-//    private static final int TIDYING    =  2 << COUNT_BITS;
-//    private static final int TERMINATED =  3 << COUNT_BITS;
+    private static final int SHUTDOWN   =  0 << COUNT_BITS;
+    private static final int STOP       =  1 << COUNT_BITS;
+    private static final int TIDYING    =  2 << COUNT_BITS;
+    private static final int TERMINATED =  3 << COUNT_BITS;
 
     /**
      *  int c = oldState | oldWorkerCount;

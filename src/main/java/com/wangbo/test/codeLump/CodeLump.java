@@ -20,7 +20,6 @@ import java.util.Map;
  * @since  [产品/模块版本]
  */
 public class CodeLump extends FatherCodeLump {
-	
     /**
      * 1.类的构造器<clinit>方法是由编译器收集类中的所有类变量的赋值操作，加上静态代码块组成，按照源代码的编写顺序确定执行顺序；
      * 2.虚拟机会保证在子类的<clinit>方法执行之前，父类的<clinit>方法已经执行完毕；
