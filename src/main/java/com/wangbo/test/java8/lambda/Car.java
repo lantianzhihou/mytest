@@ -4,6 +4,8 @@ import java.util.function.Supplier;
 
 public class Car {
 
+    private Double price;
+    
     private String name;
 
     public Car() {
@@ -29,6 +31,14 @@ public class Car {
 
     public void repair() {
         System.out.println("Repaired " + this.toString());
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public String getName() {

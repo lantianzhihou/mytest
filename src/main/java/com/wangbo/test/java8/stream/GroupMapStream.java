@@ -1,19 +1,27 @@
 package com.wangbo.test.java8.stream;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Test;
 
+import com.wangbo.test.java8.lambda.Car;
+
 /**
  * Collectors类实现了很多归约操作，例如将流转换成集合和聚合元素:
  */
 public class GroupMapStream {
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
+        List<Car> cars = new ArrayList<>();
+        Map<String, Map<Double, List<Car>>> collect = cars.stream()
+                .collect(Collectors.groupingBy(Car::getName, Collectors.groupingBy(Car::getPrice)));
+        System.out.println(collect.keySet());
     }
 
     /**
