@@ -34,13 +34,14 @@ public class TestPriod {
         System.out.println("间隔总月数：" + period.toTotalMonths());
         System.out.println("两个时间间隔为：" + period.get(ChronoUnit.YEARS) + "年"
                 + period.get(ChronoUnit.MONTHS) + "月" + period.get(ChronoUnit.DAYS) + "日");
-        LocalDate localDate3 = LocalDate.of(2020, 3, 24);
+        LocalDate localDate3 = LocalDate.of(2020, 4, 22);
         System.out.println("间隔总天数：" + localDate3.until(localDate2, ChronoUnit.DAYS));
         
         System.out.println("======================使用Duration求时间间隔=======================");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime1 = LocalDateTime.parse("2016-05-06 12:32:50", timeFormatter);
-        LocalDateTime localDateTime2 = LocalDateTime.parse("2017-08-06 12:31:51", timeFormatter);
+        LocalDateTime localDateTime2 = LocalDateTime.parse("2016-05-08 12:33:51", timeFormatter);
+        LocalDateTime localDateTime3 = LocalDateTime.MIN;
         Duration duration = Duration.between(localDateTime1, localDateTime2);
         System.out.println(duration);   // PT10967H59M1S
         System.out.println("间隔天数：" + duration.toDays());

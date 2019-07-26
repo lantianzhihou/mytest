@@ -24,6 +24,12 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
 public class TestLocalDateTime {
+    
+    public static void main(String[] args) {
+        LocalDateTime endTime = LocalDateTime.of(2019, 5, 29, 0, 0, 0);
+        LocalDateTime startTime = endTime.minusMonths(3);
+        System.out.println(startTime);
+    }
 
     @Test
     public void testChina() {
