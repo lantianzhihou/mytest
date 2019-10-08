@@ -23,7 +23,13 @@ import com.google.common.collect.Lists;
 
 public class CollectionStream {
     public static void main(String[] args) {
-
+        String unitAddr = "{street1}/{community1}/{buildingName1}/{单元号},{street2}/{community2}/{buildingName}/{单元号}";
+        String[] unitAdresses = unitAddr.split(",");
+        Set<String> communities = Arrays.stream(unitAdresses)
+                .collect(Collectors.mapping(unitAdress -> {
+                    return unitAdress.split("/")[1];
+                }, Collectors.toSet()));
+        System.out.println(communities);
     }
 
     /**
