@@ -1,14 +1,35 @@
 package com.wangbo.test.java8.lambda;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
+import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
+@Component
 public class TestLambda {
 
+    @Test
+    public void displayAnnotation() {
+        Annotation[] declaredAnnotations = TestLambda.class.getDeclaredAnnotations();
+        for (Annotation annotation : declaredAnnotations) {
+            System.out.println(annotation.getClass()); // class com.sun.proxy.$Proxy1
+            System.out.println(annotation.getClass().getDeclaredAnnotations()); // []
+            System.out.println(Component.class == annotation.getClass()); // false
+            System.out.println(Component.class == annotation.annotationType()); //true
+        }
+    }
+    
+    @Test
+    public void displayMethod() throws NoSuchMethodException, SecurityException {
+        Method method = TestLambda.class.getMethod("displayMethod");
+        System.out.println(method.getDeclaredAnnotations());
+    }
+    
     @Test
     public void displayMethodRef() {
         List<Car> cars = Lists.newArrayList(new Car("新车1号"), new Car("新车2号"), new Car("新车3号"), new Car("新车4号"));
