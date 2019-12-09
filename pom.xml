@@ -216,6 +216,13 @@
             <artifactId>freemarker</artifactId>
             <version>2.3.27-incubating</version>
         </dependency>
+
+		<!-- netty TCP NCP -->
+		<dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.6.Final</version>
+        </dependency>
 	</dependencies>
 
 	<build>
