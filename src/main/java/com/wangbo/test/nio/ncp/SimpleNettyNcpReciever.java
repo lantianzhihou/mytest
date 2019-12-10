@@ -1,15 +1,15 @@
 package com.wangbo.test.nio.ncp;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.netty.util.CharsetUtil;
 import io.netty.util.internal.ThreadLocalRandom;
 
 /**
@@ -29,6 +29,10 @@ public class SimpleNettyNcpReciever {
 	}
 
 	public static void main(String[] args) throws Exception {
+//		System.out.println(Arrays.toString(hexStrToByteArray("A5018080")));
+//		System.out.println(-69 & 0x7F);
+//		System.out.println(bytesToHex(new byte[] {-69}));
+		
 		int port = 8080;
 		new SimpleNettyNcpReciever().run(port);
 	}
@@ -65,17 +69,62 @@ public class SimpleNettyNcpReciever {
 		@Override
 		protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet)
 		        throws Exception {
-
-			String req = packet.content().toString(CharsetUtil.UTF_16);//上面说了，通过content()来获取消息内容
-			System.out.println(req);
-			if ("谚语字典查询？".equals(req)) {//如果消息是“谚语字典查询？”，就随机获取一条消息发送出去。
-				/**
-				 * 重新 new 一个DatagramPacket对象，我们通过packet.sender()来获取发送者的消息。 重新发达出去！
-				 */
+			//上面说了，通过content()来获取消息内容
+			ByteBuf content = packet.content();
+			String dataHeader = SimpleNettyNcpReciever
+			        .bytesToHex(new byte[] { content.getByte(0) });
+			int length = content.getByte(1) & 0xFF;
+			byte[] dst = new byte[length + 2];
+			//byte[] buffer = new byte[4096];
+			content.getBytes(0, dst, 0, length + 2);
+			String dataStr = SimpleNettyNcpReciever.bytesToHex(dst);
+			System.out.println(dataStr);
+			if ("5A".equals(dataHeader)) {
+				String dataType = dataStr.substring(4, 4+2);
+				System.out.println("===dataType:" + dataType);
+				
+				String deviceType = dataStr.substring(6, 6+2);
+				System.out.println("===deviceType:" + deviceType);
+				
+				// 首位为运营商代号，4表示移动；数据库不存储运营商代号
+				String deviceNo = dataStr.substring(8, 8 + 8 * 2);
+				System.out.println("===deviceNo:" + deviceNo);
+				
+				int rssi = content.getByte(15) & 0xFF;
+				System.out.println("===rssi:" + (rssi < 0 ? -(rssi & 0x7F) : rssi));
+				
+				int batteryLevel = content.getByte(17) & 0xFF;
+				System.out.println("===batteryLevel:" + batteryLevel / 10.0);
+				// 温度
+				int temperature = content.getByte(18) & 0xFF;
+				System.out.println("===temperature:"
+				        + (temperature < 0 ? -(temperature & 0x7F) : temperature));
+				// 湿度
+				int humidity = content.getByte(19) & 0xFF;
+				System.out.println("===humidity:" + humidity + "%");
+				
+				// 井盖状态，最后一位0表示关闭，1表示打开
+				int state = content.getByte(20) & 0xFF;
+				System.out.println("===state:" + (state & 0x01));
+				
+				// 倾斜
+				int slantAngle = content.getByte(21) & 0xFF;
+				System.out.println("===slantAngle:" + slantAngle);
+				
+//				ctx.writeAndFlush(new DatagramPacket(
+//				        Unpooled.copiedBuffer(hexStrToByteArray("A5018080")), packet.sender()));
+			} else if ("AA".equals(dataHeader)) {
+				
+			}
+			/**
+			 * 重新 new 一个DatagramPacket对象，我们通过packet.sender()来获取发送者的消息。 重新发达出去！
+			 */
+			/*System.out.println(req);
+			if ("谚语字典查询？".equals(req)) {
 				ctx.writeAndFlush(new DatagramPacket(
 				        Unpooled.copiedBuffer("谚语查询结果：" + nextQuote(), CharsetUtil.UTF_8),
 				        packet.sender()));
-			}
+			}*/
 		}
 
 		@Override
@@ -84,5 +133,27 @@ public class SimpleNettyNcpReciever {
 			cause.printStackTrace();
 		}
 
+	}
+	
+	private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+	public static String bytesToHex(byte[] bytes) {
+		char[] hexChars = new char[bytes.length * 2];
+		for (int j = 0; j < bytes.length; j++) {
+			int v = bytes[j] & 0xFF;
+			hexChars[j * 2] = hexArray[v >>> 4];
+			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+		}
+		return new String(hexChars);
+	}
+	
+	public static byte[] hexStrToByteArray(String s) {
+	    int len = s.length();
+	    byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) 
+	        ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
 	}
 }

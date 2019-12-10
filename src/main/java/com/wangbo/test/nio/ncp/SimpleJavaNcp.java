@@ -15,7 +15,13 @@ import io.netty.util.CharsetUtil;
 public class SimpleJavaNcp {
 	
 	public static void main(String[] args) {
-		
+		char[] hexChars = new char[4];
+		int v = 90 & 0xFF;
+		int first = v >>> 4;
+		int second = v & 0x0F;
+		hexChars[0] = hexArray[first];
+		hexChars[1] = hexArray[second];
+		System.out.println(11);
 	}
 	
 	static class UDPSendTest {
@@ -43,6 +49,7 @@ public class SimpleJavaNcp {
 			socket.receive(packet);
 			//3.解析数据,packet中有发送数据的源IP和源port（其中port是随机产生的）
 			System.out.println(packet.getPort());
+			System.out.println(receiveData[0]);
 			System.out.println(bytesToHex(receiveData));
 			System.out.println("receive data end");
 		}
