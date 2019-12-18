@@ -1,5 +1,7 @@
 package com.wangbo.test.nio.ncp;
 
+import java.util.Arrays;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -28,15 +30,6 @@ public class SimpleNettyNcpReciever {
 		b.bind(port).sync().channel().closeFuture().await();
 	}
 
-	public static void main(String[] args) throws Exception {
-//		System.out.println(Arrays.toString(hexStrToByteArray("A5018080")));
-//		System.out.println(-69 & 0x7F);
-//		System.out.println(bytesToHex(new byte[] {-69}));
-		
-		int port = 8080;
-		new SimpleNettyNcpReciever().run(port);
-	}
-	
 	static class ChineseProverbServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 		//谚语列表
 		private static final String[] DICTIONARY = { "只要功夫深，铁棒磨成针。", "旧时王谢堂前燕,飞入寻常百姓家。",
@@ -71,14 +64,18 @@ public class SimpleNettyNcpReciever {
 		        throws Exception {
 			//上面说了，通过content()来获取消息内容
 			ByteBuf content = packet.content();
+			System.out.println(content.readableBytes());
+			byte[] buffer = new byte[4096];
+			content.getBytes(0, buffer,0,content.capacity());
+			System.out.println(SimpleNettyNcpReciever.bytesToHex(buffer));
+			
+			int length = content.getByte(1) & 0xFF;
+			byte[] dst = new byte[length + 3];
+			content.getBytes(0, dst, 0, length + 3);
+			String dataStr = SimpleNettyNcpReciever.bytesToHex(dst);
+			
 			String dataHeader = SimpleNettyNcpReciever
 			        .bytesToHex(new byte[] { content.getByte(0) });
-			int length = content.getByte(1) & 0xFF;
-			byte[] dst = new byte[length + 2];
-			//byte[] buffer = new byte[4096];
-			content.getBytes(0, dst, 0, length + 2);
-			String dataStr = SimpleNettyNcpReciever.bytesToHex(dst);
-			System.out.println(dataStr);
 			if ("5A".equals(dataHeader)) {
 				String dataType = dataStr.substring(4, 4+2);
 				System.out.println("===dataType:" + dataType);
@@ -137,6 +134,11 @@ public class SimpleNettyNcpReciever {
 	
 	private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
+	/**
+	 * 将十进制数字节数组转成相应的2位十六进制 ，如24=>'18'
+	 * @param bytes
+	 * @return
+	 */
 	public static String bytesToHex(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
 		for (int j = 0; j < bytes.length; j++) {
@@ -147,6 +149,22 @@ public class SimpleNettyNcpReciever {
 		return new String(hexChars);
 	}
 	
+	public static void main(String[] args) throws Exception {
+		System.out.println(Arrays.toString(hexStrToByteArray("D7")));
+//		System.out.println(-69 & 0x7F);
+//		System.out.println(bytesToHex(new byte[] {-69}));
+		System.out.println(bytesToHex(new byte[] { 12,34,55,46,88,-24 }));;
+		System.out.println(getBCC(new byte[] { 12,34,55,46,88,-24 }));
+		
+//		int port = 8080;
+//		new SimpleNettyNcpReciever().run(port);
+	}
+	
+	/**
+	 * 将2位十六进制字符串转换成十进制，如‘D7’=>13*16+7=(byte)215=-41
+	 * @param s
+	 * @return
+	 */
 	public static byte[] hexStrToByteArray(String s) {
 	    int len = s.length();
 	    byte[] data = new byte[len / 2];
@@ -155,5 +173,55 @@ public class SimpleNettyNcpReciever {
 	        ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
 	    }
 	    return data;
+	}
+	
+	/**
+	 * BCC校验（异或校验）算法求 字节数组的校验值
+	 * 如{12,34,55,46,88,-24} => 十六进制字符串0C22372E58E8 => 十六进制87
+	 * 地址：https://www.xuebuyuan.com/537890.html
+	 * 在线工具：http://www.ip33.com/bcc.html
+	 * @param data
+	 * @return
+	 */
+	public static String getBCC(byte[] data) {
+		String ret = "";
+		byte BCC[] = new byte[1];
+		for (int i = 0; i < data.length; i++) {
+			BCC[0] = (byte) (BCC[0] ^ data[i]);
+		}
+		String hex = Integer.toHexString(BCC[0] & 0xFF);
+		if (hex.length() == 1) {
+			hex = '0' + hex;
+		}
+		ret += hex.toUpperCase();
+		return ret;
+	}
+	
+	/**
+	 * 采用IEEE 754标准十六进制字符串转double
+	 * 如3D 73 6F 63 => 0.05943239852786064
+	 * 地址：https://www.cnblogs.com/bingoj/p/11148305.html
+	 * 在线工具：http://lostphp.com/hexconvert/
+	 * @param bytes
+	 * @return
+	 */
+	public static double transferForIEEE754(String hexStr) {
+		StringBuffer binaryStr = new StringBuffer();
+		for (int i = 0; i < hexStr.length(); i += 2) {
+			String a = hexStr.substring(i, i + 2);
+			int c = Integer.parseInt(a, 16);
+			String item = String.format("%08d", Integer.parseInt(Integer.toBinaryString(c)));
+			binaryStr.append(item);
+		}
+		int n = Integer.parseInt(binaryStr.substring(1, 9), 2);
+		String mStr = binaryStr.substring(9, binaryStr.length() - 1);
+		double sum = 0;
+		for (int i = 1; i <= mStr.length(); i++) {
+			if (mStr.charAt(i - 1) == '1') {
+				sum = sum + Math.pow(0.5, i);
+			}
+		}
+		double a = (Math.pow(2, n - 127)) * (1 + sum);
+		return a;
 	}
 }

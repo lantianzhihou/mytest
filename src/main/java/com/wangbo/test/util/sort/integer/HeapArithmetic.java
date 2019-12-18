@@ -22,11 +22,51 @@ public class HeapArithmetic {
 	
 	public static void main(String[] args) {
 		int[] arr = {4,8,6,2,3,5,1,2,3,8,7};
-		heapSort(arr);
-		System.out.println(Arrays.toString(arr));
+//		heapSort1(arr);
+//		System.out.println(Arrays.toString(arr));
+		
+		heapSort2(arr, 0, arr.length - 4);
+		System.out.println("last: " + Arrays.toString(arr));
 	}
 	
-	public static void heapSort(int[] arr) {
+	public static void heapSort2(int[] arr, int startIndex, int endIndex) {
+		if (startIndex >= endIndex || startIndex < 0 || arr.length - 1 < endIndex)
+			return;
+		int middleIdx = (endIndex - startIndex + 1) / 2 - 1;
+		for (; middleIdx >= startIndex; middleIdx--) {
+			createMaxHeap(arr, middleIdx, endIndex);
+		}
+		for (int i = endIndex; i > startIndex; i--) {
+			System.out.println(Arrays.toString(arr));
+			//堆顶元素(第一个元素)与Kn交换
+			int temp = arr[startIndex];
+			arr[startIndex] = arr[i];
+			arr[i] = temp;
+
+			createMaxHeap(arr, startIndex, i - 1);
+		}
+	}
+	
+	public static void createMaxHeap(int[] arr,int index,int endIndex) {
+		if (index * 2 + 1 > endIndex || endIndex > arr.length - 1) {
+			return;
+		}
+		//左子节点位置
+		int left = index * 2 + 1;
+		//右子节点位置，如果没有右节点，默认为左节点位置
+		int right = (left + 1) > endIndex ? left : (left + 1);
+		//交换父节点与左右子节点中的最大值
+		int maxChildId = arr[left] >= arr[right] ? left : right;
+		if (arr[maxChildId] > arr[index]) { //交换父节点与左右子节点中的最大值
+			int temp = arr[index];
+			arr[index] = arr[maxChildId];
+			arr[maxChildId] = temp;
+			
+			createMaxHeap(arr, maxChildId, endIndex);
+		}
+	}
+	
+	public static void heapSort1(int[] arr) {
 		for (int i = arr.length - 1; i >= 0; i--) {
 			max_heapify(arr, 0, i);
 			//堆顶元素(第一个元素)与Kn交换
