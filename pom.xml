@@ -200,7 +200,6 @@
 			<artifactId>thumbnailator</artifactId>
 			<version>0.4.8</version>
 		</dependency>
-		<!-- 添加Sqlite依赖（可选：如果不需要使用印章功能的话，不需要添加此依赖） -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
