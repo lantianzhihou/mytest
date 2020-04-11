@@ -2,6 +2,7 @@ package com.wangbo.test.util.importOrExport;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -38,7 +40,19 @@ public class ExcelDownload {
 	// excel自定义模板下载 start
 	final String[] UNIT_EXCEL_HEADS = { "*单位名称", "*信用代码", "单位地址", "法人代表", "联系方式", "经营范围" };
 	
-	public void downloadExcelTemp(HttpServletResponse response) throws Exception {
+	/**
+	 * 谷歌 (代理信息)
+	 * Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+	 * Gecko) Chrome/80.0.3987.163 Safari/537.36
+	 * 
+	 * 火狐(代理信息)
+	 * Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0
+	 * 
+	 * IE、Edge(代理信息)
+	 * Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
+	 * like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362
+	 */
+	public void downloadExcelTemp(HttpServletRequest request,HttpServletResponse response) throws Exception {
 		String excelName = "单位数据导入模板";
 		Map<Integer, List<String>> map = new HashMap<Integer, List<String>>();
 		String[] example = null;
@@ -46,8 +60,17 @@ public class ExcelDownload {
 		response.setContentType("application/vnd.ms-excel");
 		response.setCharacterEncoding("utf-8");
 		try {
-			String fileName = new String(excelName.getBytes("gb2312"), "ISO8859-1") + ".xlsx";
-			response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+			String fileName = null;
+			String userAgent = request.getHeader("User-Agent");
+			if (null != userAgent && (-1 != userAgent.indexOf("MSIE")
+			        || -1 != userAgent.indexOf("Trident") || -1 != userAgent.indexOf("Edge"))) {
+				// ie浏览器及Edge浏览器
+				fileName = java.net.URLEncoder.encode(excelName, "UTF-8");
+			} else if (null != userAgent && -1 != userAgent.indexOf("Mozilla")) {
+				// 火狐,Chrome等浏览器
+				fileName = new String(excelName.getBytes("UTF-8"), "iso-8859-1");
+			}
+			response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
 			OutputStream os = response.getOutputStream();
 			wb.write(os);
 			os.flush();
