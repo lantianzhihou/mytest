@@ -1,18 +1,21 @@
 package com.wangbo.test.concurrentAndmutiThread.threadTask;
 
 import java.util.Date;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 
@@ -49,7 +52,7 @@ public class ScheduleConfigurations implements SchedulingConfigurer {
         
 		System.out.println("设置任务计划执行器");
 //		taskRegistrar.setScheduler(Executors.newScheduledThreadPool(10));
-		taskRegistrar.setScheduler(taskExecutor());
+		taskRegistrar.setScheduler(taskExecutor2());
 		
 		taskRegistrar.addTriggerTask(new Runnable() {
 			
@@ -68,7 +71,8 @@ public class ScheduleConfigurations implements SchedulingConfigurer {
 		});
 	}
 	
-	public Executor taskExecutor() {
+	@Bean(name="taskExecutor")
+	public ScheduledExecutorService taskExecutor1() {
 		return new ScheduledThreadPoolExecutor(10,new ThreadFactory() {
 			final String namePrefix = "unicornTimedTask";
 			
@@ -86,6 +90,30 @@ public class ScheduleConfigurations implements SchedulingConfigurer {
 				return thread;
 			}
 		});
+	}
+	
+	@Bean(name="taskScheduler")
+	public TaskScheduler taskExecutor2() {
+		ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10,new ThreadFactory() {
+			final String namePrefix = "unicornTimedTask";
+			
+			final ThreadGroup group = (System.getSecurityManager() != null)
+					? System.getSecurityManager().getThreadGroup()
+					: Thread.currentThread().getThreadGroup();
+			final AtomicLong count = new AtomicLong();
+					
+			@Override
+			public Thread newThread(Runnable target) {
+			    Thread thread = new Thread(group, target, namePrefix + "-" + count.incrementAndGet());
+//			    thread.setPriority(1);
+//			    int maxPriority = group.getMaxPriority();
+//			    System.out.println(maxPriority);
+				return thread;
+			}
+		});
+		return new ConcurrentTaskScheduler(scheduledThreadPoolExecutor);
 		
 	}
+	
+	
 }
