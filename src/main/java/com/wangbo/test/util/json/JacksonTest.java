@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -37,8 +38,18 @@ public class JacksonTest {
         // strSet.add("时");
         // strSet.add("中");
         // System.out.println(strSet);
-        String abc = null;
-        System.out.println(Pattern.matches("(.*)nihao(.*)", abc));
+		String abc = null;
+//		System.out.println(Pattern.matches("(.*)nihao(.*)", abc));
+
+		String tranId = "";
+		double randomInt = Math.random();
+		double randomLong = randomInt * 1000000000;
+		String tranString = !StringUtils.isEmpty(tranId) ? tranId
+		        : String.format("%016d", (long) randomLong);
+		
+		System.out.println(randomInt);
+		System.out.println((long) randomLong);
+		System.out.println(tranString);
 	}
 	
 	@Test
